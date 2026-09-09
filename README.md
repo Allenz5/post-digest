@@ -60,22 +60,6 @@ Each level costs more than the last, so the expensive ones go last.
 | **read** | `post-screener` opens the post **and its comment tree** | a browser per post, 3 in flight |
 | **write** | one Notion row, ten columns, a `Why` naming what it hit | one call per row |
 
-**The comments are the whole point of the read level.** A post is its author's best case for
-itself; the replies are where that case survives or falls apart, and they are the only reliable
-way to tell a write-up from an ad for its writer. LinkedIn is the exception — there is no tool
-that reads one LinkedIn post, so `linkedin-feed-reader` pulls and screens in a single step, on
-body text alone, and is told to be stricter because of what it cannot see.
-
-**The control sample is the part most pipelines skip.** The screen throws away nine in ten and
-nothing looks at them again, so half the question goes unmeasured: the rating loop only ever
-sees rows that got *written*, which means every correction the system receives is about a false
-positive. So the rejects get numbered in feed order and every ⌊total ÷ 10⌋-th one is read anyway,
-under the same standard. Mechanically, not by picking the promising ones — the moment you choose,
-the sample measures your judgement a second time instead of testing it.
-
-**An empty run is a real outcome.** Once the list contains filler it has to be skimmed, and then
-it is just another feed.
-
 ## The Notion feedback path
 
 This is the part worth reading the code for. Two channels come back from Notion, they are not
