@@ -33,10 +33,10 @@ FINISHED: 2026-08-26T13:47:52    # `date -Iseconds` just before dispatching you
 STATUS:   complete | partial | interrupted | failed
 FUNNEL:
   x-following  70 → 66 → 12 → 12 → 3
-  xiaohongshu  35 → 35 →  4 →  4 → 0   (6 notes put their text in images, not shortlisted)
+  rednote  35 → 35 →  4 →  4 → 0   (6 notes put their text in images, not shortlisted)
   linkedin     —  (logged out, no source-state.json)
 BUGS:
-  [xiaohongshu] text lives in the images → 4 notes wasted, not a bad batch
+  [rednote] text lives in the images → 4 notes wasted, not a bad batch
   none                            # an explicit claim that nothing broke this round
 NOTABLE:
   free prose — see below
@@ -60,7 +60,7 @@ to end.
 
 1. **Channel coverage.** Every channel must appear, as numbers or as `—`.
 
-   `x-following` `x-foryou` `reddit` `xiaohongshu` `linkedin` `sample`
+   `x-following` `x-foryou` `reddit` `rednote` `linkedin` `sample`
 
    A channel the caller left out entirely goes in as `<name>  ? → ? → ? → ? → ?` and gets a
    `Bugs` line: `[run-logger] <name> was not reported — this cell is missing, not zero`.

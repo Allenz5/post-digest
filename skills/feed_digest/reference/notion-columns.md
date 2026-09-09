@@ -13,7 +13,7 @@ a placeholder, and never a claim nobody checked.
 
 **Every row gets all ten columns**: `Title`, `URL`, `Platform`, `Author`, `Engagement`,
 `Captured`, `Score`, `Summary`, `Why`, `Verified`. `Platform` is one of x, reddit,
-xiaohongshu, linkedin; `Author` is the handle or name the feed gave you; `Engagement` is
+rednote, linkedin; `Author` is the handle or name the feed gave you; `Engagement` is
 whatever that platform counts, as a number; `Captured` is this run's date.
 
 The middle four go missing silently — nothing errors and the run still reports success —
@@ -26,7 +26,7 @@ A LinkedIn share post can carry no identifiable author; a platform can expose no
 count. Empty is a fact about the source; an invented value is a lie that nothing downstream
 can detect.
 
-**When the post has a title, `Title` is that title, translated.** Reddit and Xiaohongshu
+**When the post has a title, `Title` is that title, translated.** Reddit and RedNote
 hand you one. Translate it as literally as Chinese will bear — same claim, same emphasis,
 no angle of your own bolted on after a colon. The user has to be able to open the link and
 recognise the row, and a title you rewrote cannot do that.

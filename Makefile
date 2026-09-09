@@ -1,4 +1,4 @@
-.PHONY: setup build check clean xhs xhs-login x-login install uninstall schedule unschedule
+.PHONY: setup build check clean rednote rednote-login x-login install uninstall schedule unschedule
 
 # Four dependency systems, one per server runtime. `setup` brings all of them up
 # from a fresh clone; `check` proves each server actually speaks MCP.
@@ -23,14 +23,14 @@ servers/x/dist: servers/x/node_modules
 servers/xiaohongshu/bin/xiaohongshu-mcp:
 	cd servers/xiaohongshu && go build -o bin/xiaohongshu-mcp .
 
-# xiaohongshu speaks HTTP, not stdio — it has to be running before Claude Code
+# rednote speaks HTTP, not stdio — it has to be running before Claude Code
 # can reach it. The other three are spawned on demand.
-xhs:
+rednote:
 	cd servers/xiaohongshu && ./bin/xiaohongshu-mcp -headless=true
 
 # Same server with a window, for when a login needs watching rather than
 # guessing. The QR itself comes back fine headless.
-xhs-login:
+rednote-login:
 	cd servers/xiaohongshu && ./bin/xiaohongshu-mcp -headless=false
 
 # X keeps its session in AUTH_DIR. That path is pinned in mcp.json because the
@@ -61,7 +61,7 @@ unschedule:
 	@rm -f $(HOME)/Library/LaunchAgents/com.post-digest.feed-digest.plist
 
 check:
-	@claude mcp list 2>&1 | grep -E 'reddit|^x:|linkedin|xiaohongshu' || echo "no servers found"
+	@claude mcp list 2>&1 | grep -E 'reddit|^x:|linkedin|rednote' || echo "no servers found"
 
 clean:
 	rm -rf servers/x/dist servers/x/node_modules

@@ -1,12 +1,12 @@
 ---
 name: feed_digest
-description: Pull the recommendation feeds from X, Reddit, Xiaohongshu and LinkedIn, screen them down to what is actually worth reading, and write the result to the Feed Digest database in Notion. Use when the user says "/feed_digest", or on a scheduled run.
+description: Pull the recommendation feeds from X, Reddit, RedNote and LinkedIn, screen them down to what is actually worth reading, and write the result to the Feed Digest database in Notion. Use when the user says "/feed_digest", or on a scheduled run.
 ---
 
 # Feed Digest
 
 You are replacing four scroll sessions with one list: the handful of things from X, Reddit,
-Xiaohongshu and LinkedIn worth this person's attention, each with a reason attached.
+RedNote and LinkedIn worth this person's attention, each with a reason attached.
 
 The standard is `skills/feed_digest/interests.md`, their own account of what they care about
 — not your taste. An empty run is a real outcome. Filler is the one failure that destroys the
@@ -44,7 +44,7 @@ there is no personalised front page; use the subreddit list in `interests.md`.
 | x for you | `scrape_timeline(type="for-you", maxPosts=30)` | 30 |
 | reddit | `get_subreddit_hot_posts(subreddit, limit=15)` per sub | 15 × subs listed |
 | linkedin | dispatch `linkedin-feed-reader` | it pulls and screens in one step |
-| xiaohongshu | `list_feeds()` | whatever the first screen hydrates, ~35. No parameter, no scrolling. |
+| rednote | `list_feeds()` | whatever the first screen hydrates, ~35. No parameter, no scrolling. |
 
 X is two feeds and they fail in opposite directions — following goes stale, for-you drifts
 toward whatever is popular. Take them in two calls; a post in both stays a following post,
@@ -82,7 +82,7 @@ The screen throws away nine in ten and nothing looks at them again, so half the 
 unmeasured. The `Rating` loop cannot close it — it only sees rows that got written, so every
 correction this skill receives is about a false positive.
 
-Concatenate the rejects in feed order — X following, X for you, Reddit, Xiaohongshu, LinkedIn
+Concatenate the rejects in feed order — X following, X for you, Reddit, RedNote, LinkedIn
 — number them, take every ⌊total ÷ 10⌋-th. Mechanically: the moment you pick the ones that
 look promising, the sample measures your judgement a second time instead of testing it. A draw
 already in the database is skipped for the next one along.
@@ -95,7 +95,7 @@ evidence there are none.
 ### Read the survivors
 
 Dispatch `post-screener`, at most three at a time — each drives a browser, X rate-limits
-concurrent sessions on one account, and Xiaohongshu launches a Chromium per request. Give each
+concurrent sessions on one account, and RedNote launches a Chromium per request. Give each
 the URL and `interests.md` in full — the examples are where the boundary calls live, and a
 screener working from a summary of the standard is judging by something you rewrote.
 
@@ -137,6 +137,6 @@ from a run that never fired.
 
 `agents/run-logger.md` defines the report it expects; send exactly that, with
 `DIGEST: Feed Digest` and one `FUNNEL` line for each of `x-following`, `x-foryou`, `reddit`,
-`xiaohongshu`, `linkedin`, `sample` — all six every run, a channel that never ran written as
+`rednote`, `linkedin`, `sample` — all six every run, a channel that never ran written as
 `—  (why)` rather than as zero. `NOTABLE` takes what this run changed and what it wants, five
 lines at most, including `criteria-keeper`'s lines verbatim.

@@ -1,7 +1,7 @@
 # post-digest
 
 A reading list that builds itself. Three times a day, unattended, it pulls the recommendation
-feeds from X, Reddit, Xiaohongshu and LinkedIn, screens a few hundred posts down to a handful,
+feeds from X, Reddit, RedNote and LinkedIn, screens a few hundred posts down to a handful,
 and writes them into a Notion database with a reason attached to every row.
 
 The interesting part is not the scraping. It is that **the standard it screens by is a file the
@@ -54,45 +54,27 @@ Each level costs more than the last, so the expensive ones go last.
 
 | level | what happens | cost |
 |---|---|---|
-| **pull** | 70 X-following + 30 X-for-you + 15 × subreddit + ~35 Xiaohongshu + 100 LinkedIn | one call each |
+| **pull** | 70 X-following + 30 X-for-you + 15 × subreddit + ~35 RedNote + 100 LinkedIn | one call each |
 | **dedup** | drop URLs already in the database | one paged query |
 | **cheap screen** | title, author, engagement, excerpt. Reject only for "not a subject they care about" | free, main loop |
 | **read** | `post-screener` opens the post **and its comment tree** | a browser per post, 3 in flight |
 | **write** | one Notion row, ten columns, a `Why` naming what it hit | one call per row |
 
-## The Notion feedback path
+### The feedback loop
 
-This is the part worth reading the code for. Two channels come back from Notion, they are not
-the same claim, and exactly one agent is allowed to act on either.
+Two things come back from Notion, and they are not the same claim.
 
-### Channel 1 — rate a row
+**Rate a row** — 👍 useful / 😐 so-so / 👎 not useful. A 👍 or 👎 goes into the examples section
+of `interests.md` immediately. The prose above the examples changes only when two ratings point
+at the same cause. 😐 changes nothing: it says the post was on topic and still missed the bar,
+and the user moves the bar, not the agent.
 
-Every digest row has a `Rating` column: **👍 useful / 😐 so-so / 👎 not useful**, plus a free-text
-`Comment`. Rating one takes a second and is the only input the system asks for.
+**Comment on a control page** — one Notion page mirrors each file the run is governed by: the
+skill, the criteria, and the four agent prompts. A comment there is about the document itself,
+so it is acted on the first time rather than waiting for a second data point.
 
-- **👍 / 👎 are about subject.** Each one lands in the examples section of `interests.md` as
-  itself, immediately.
-- **The prose above the examples changes only when two or more point at the same cause.** One 👎
-  is one post; rewriting a standard from it is how the file swings past what you meant.
-- **😐 changes nothing at all.** It says the post was on topic and still did not earn its slot —
-  a reading on the bar. The user moves the bar, not the agent. It gets counted and reported, and
-  that is it.
-
-### Channel 2 — comment on the control page
-
-A Notion page called `Digest Controls` mirrors every file the run is governed by — the skill,
-the criteria, and each agent prompt. Commenting on one is you talking about the *document*, at
-the level the document is written, so it is acted on the first time rather than needing a second
-data point.
-
-One page per file, six of them: `SKILL.md`, `interests.md`, and the four agent prompts —
-including `criteria-keeper.md` itself, so you can comment on the feedback mechanism through the
-feedback mechanism. The page ↔ file map lives in `agents/criteria-keeper.md` and nowhere else; a
-caller holding its own copy would be a second place for it to go stale.
-
-The mirror is one-way: `criteria-keeper` edits the file, then republishes it over the page. A
-thread it has acted on gets a reply `✅ Changed: <which instruction changed, and what it said
-before>`; a reply *underneath* that ✅ makes the thread live again and outranks what it decided
-last time. A complaint with no wanted behaviour attached gets `❓ <the question>` and is left
-open — nobody is awake to answer at 8am, and a standard bent the wrong way costs more than one
-carried to tomorrow.
+`criteria-keeper` runs first and is the only thing that edits any of it. Three rules do the
+work: **rewrite, never append** (`interests.md` has a 200-line ceiling, so a new idea has to
+displace an older one); **never paste the user's words in** — rewrite the instruction that
+produced the behaviour; and **test the change against the 👍 rows first**, because a rule that
+would have rejected one of those has overshot.

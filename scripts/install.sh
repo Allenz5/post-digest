@@ -70,9 +70,9 @@ reg x x \
   -- node "$ROOT/servers/x/dist/mcp.js" --profile director
 reg linkedin linkedin \
   -- "$ROOT/servers/linkedin/.venv/bin/linkedin-mcp-server" --transport stdio --log-level ERROR
-claude mcp remove --scope user xiaohongshu >/dev/null 2>&1 || true
-claude mcp add --scope user --transport http xiaohongshu http://localhost:18060/mcp >/dev/null
-echo "    reddit x linkedin xiaohongshu"
+claude mcp remove --scope user rednote >/dev/null 2>&1 || true
+claude mcp add --scope user --transport http rednote http://localhost:18060/mcp >/dev/null
+echo "    reddit x linkedin rednote"
 
 echo "==> rendering the launchd plist"
 sed -e "s|@@TOOLKIT_ROOT@@|$ROOT|g" -e "s|@@HOME@@|$HOME|g" -e "s|@@USER@@|$(id -un)|g" \
@@ -86,5 +86,5 @@ Installed. Restart Claude Code, then:
   /feed_digest             screen the four social feeds into Notion
 
 Isolation check — the main loop should NOT see any of these:
-  mcp__x__get_post, mcp__reddit__get_post, mcp__xiaohongshu__get_post
+  mcp__x__get_post, mcp__reddit__get_post, mcp__rednote__get_post
 EOF

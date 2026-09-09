@@ -20,7 +20,7 @@ for dir in "$ROOT"/skills/*/; do
 done
 
 echo "==> removing MCP servers"
-for s in reddit x linkedin xiaohongshu; do
+for s in reddit x linkedin rednote; do
   claude mcp remove --scope user "$s" >/dev/null 2>&1 && echo "    $s"
 done
 

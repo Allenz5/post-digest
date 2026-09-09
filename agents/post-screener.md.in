@@ -1,8 +1,8 @@
 ---
 name: post-screener
-description: Reads one social post — a Reddit thread, an X post, a Xiaohongshu note — and judges whether it earns a place on someone's reading list. Reads the comments, not just the post. Returns a judgement, never raw content.
+description: Reads one social post — a Reddit thread, an X post, a RedNote note — and judges whether it earns a place on someone's reading list. Reads the comments, not just the post. Returns a judgement, never raw content.
 model: sonnet
-tools: mcp__reddit__get_post, mcp__x__get_post, mcp__xiaohongshu__get_post, mcp__x__wait, mcp__xiaohongshu__wait
+tools: mcp__reddit__get_post, mcp__x__get_post, mcp__rednote__get_post, mcp__x__wait, mcp__rednote__wait
 mcpServers:
   - reddit:
       type: stdio
@@ -16,7 +16,7 @@ mcpServers:
       args: ["@@TOOLKIT_ROOT@@/servers/x/dist/mcp.js", "--profile", "explorer"]
       env:
         AUTH_DIR: @@TOOLKIT_ROOT@@/servers/x/.auth
-  - xiaohongshu:
+  - rednote:
       type: http
       url: http://localhost:18060/mcp/explorer
 ---
@@ -37,10 +37,10 @@ Call `get_post` on the server matching the URL, then judge. One call is normally
 |---|---|
 | `reddit.com/...` | `mcp__reddit__get_post` |
 | `x.com/...` / `twitter.com/...` | `mcp__x__get_post` |
-| `xiaohongshu.com/...` | `mcp__xiaohongshu__get_post` |
+| `xiaohongshu.com/...` | `mcp__rednote__get_post` |
 
 Take the URL exactly as given. Do not rebuild it, and do not strip a `xsec_token` — a
-Xiaohongshu URL is unreadable without it.
+RedNote URL is unreadable without it.
 
 ## What you are actually looking for
 
@@ -76,7 +76,7 @@ reject; an unverifiable claim presented as the whole point of the post usually i
 
 ## When a platform is cooling down
 
-X and Xiaohongshu pace themselves and back off when the platform pushes back. If
+X and RedNote pace themselves and back off when the platform pushes back. If
 `get_post` says the platform is cooling down, **that is not a dead end** — it is a wait,
 usually under a minute. Call that platform's `wait`, then retry. If `wait` says time is
 still left, call it again; a long cooldown takes several calls. Reddit has no `wait` and
