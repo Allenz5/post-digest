@@ -1,0 +1,70 @@
+{
+  "env": {
+    "MAX_MCP_OUTPUT_TOKENS": "50000"
+  },
+  "permissions": {
+    "allow": [
+      "Agent(post-screener)",
+      "Agent(run-logger)",
+      "Agent(criteria-keeper)",
+      "Agent(linkedin-feed-reader)",
+      "Skill(update_skill)",
+
+      "mcp__x__scrape_timeline",
+      "mcp__reddit__get_subreddit_hot_posts",
+      "mcp__xiaohongshu__list_feeds",
+      "mcp__linkedin__get_feed",
+
+      "mcp__linkedin__get_person_profile",
+      "mcp__linkedin__get_company_profile",
+
+      "mcp__x__get_post",
+      "mcp__x__wait",
+      "mcp__reddit__get_post",
+      "mcp__xiaohongshu__get_post",
+      "mcp__xiaohongshu__wait",
+
+      "Read(~/.claude/skills/feed_digest/**)",
+      "Read(agents/**)",
+      "Edit(agents/**)",
+      "Edit(~/.claude/skills/feed_digest/interests.md)",
+
+      "mcp__claude_ai_Notion__notion-fetch",
+      "mcp__claude_ai_Notion__notion-query-data-sources",
+      "mcp__claude_ai_Notion__notion-create-pages",
+      "mcp__claude_ai_Notion__notion-update-page",
+      "mcp__claude_ai_Notion__notion-get-comments",
+      "mcp__claude_ai_Notion__notion-create-comment",
+
+      "Bash(date:*)"
+    ],
+    "deny": [
+      "WebFetch",
+      "mcp__x__tweet",
+      "mcp__x__thread",
+      "mcp__x__reply_to_post",
+      "mcp__x__reply_to_comment_by_id",
+      "mcp__x__replace_comment_by_id",
+      "mcp__x__quote_tweet",
+      "mcp__x__like_post",
+      "mcp__x__unlike_post",
+      "mcp__x__like_comment_by_id",
+      "mcp__x__unlike_comment_by_id",
+      "mcp__x__retweet_post",
+      "mcp__x__unretweet_post",
+      "mcp__x__bookmark_post",
+      "mcp__x__unbookmark_post",
+      "mcp__xiaohongshu__publish_content",
+      "mcp__xiaohongshu__publish_with_video",
+      "mcp__xiaohongshu__post_comment_to_feed",
+      "mcp__xiaohongshu__reply_comment_in_feed",
+      "mcp__xiaohongshu__reply_notification",
+      "mcp__xiaohongshu__like_feed",
+      "mcp__xiaohongshu__like_notification",
+      "mcp__xiaohongshu__favorite_feed",
+      "mcp__xiaohongshu__delete_cookies",
+      "mcp__linkedin__send_message",
+      "mcp__linkedin__connect_with_person"
+    ]
+  }
+}

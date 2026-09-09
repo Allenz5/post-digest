@@ -1,0 +1,195 @@
+import { Page } from "playwright";
+import { TwitterMedia, TwitterUser } from "../types";
+
+/**
+ * Wait for the page to be ready and content to be loaded
+ */
+export async function waitForTwitterReady(page: Page) {
+  await page.waitForLoadState('load');
+  await page.waitForTimeout(1000); // Extra safety
+}
+
+/**
+ * Scroll down by a fraction of a viewport and wait for new content to load.
+ *
+ * IMPORTANT: do NOT jump to document.body.scrollHeight. X's timeline is
+ * virtualized — off-screen tweets are unmounted from the DOM — so a full-page
+ * jump scrolls past dozens of posts that are never rendered while the caller is
+ * reading, and they get skipped entirely. Scrolling ~80% of a viewport keeps a
+ * small overlap between steps so every tweet passes through the DOM and can be
+ * captured (the caller de-dupes by postId).
+ */
+export async function scrollAndWait(page: Page, waitTime: number = 2000) {
+  await page.evaluate(() => window.scrollBy(0, Math.round(window.innerHeight * 0.8)));
+  await page.waitForTimeout(waitTime);
+}
+
+/**
+ * Parse a number from text (handles K, M suffixes)
+ */
+export function parseCount(text: string): number {
+  if (!text || text === '') return 0;
+  
+  text = text.trim().toLowerCase();
+  
+  if (text.includes('k')) {
+    return parseFloat(text.replace('k', '')) * 1000;
+  } else if (text.includes('m')) {
+    return parseFloat(text.replace('m', '')) * 1000000;
+  }
+  
+  // Remove commas and parse
+  return parseInt(text.replace(/,/g, ''), 10) || 0;
+}
+
+/**
+ * Calculate engagement rate
+ */
+export function calculateEngagementRate(
+  likes: number,
+  retweets: number,
+  replies: number,
+  impressions: number
+): number {
+  if (impressions === 0) return 0;
+  return ((likes + retweets + replies) / impressions) * 100;
+}
+
+/**
+ * Extract user data from a tweet element
+ */
+export async function extractUserFromElement(element: any): Promise<TwitterUser> {
+  const username = await element.$eval('[data-testid="User-Name"] a', (el: any) => {
+    const href = el.getAttribute('href');
+    return href ? href.replace('/', '') : '';
+  }).catch(() => '');
+  
+  const displayName = await element.$eval('[data-testid="User-Name"] span', (el: any) => el.textContent)
+    .catch(() => '');
+  
+  const avatarUrl = await element.$eval('img[src*="profile_images"]', (el: any) => el.src)
+    .catch(() => '');
+  
+  // Check for verification badges
+  const isVerified = await element.$('[aria-label="Verified account"]').then((el: any) => el !== null).catch(() => false);
+  const isBlueVerified = await element.$('[aria-label*="verified"]').then((el: any) => el !== null).catch(() => false);
+  
+  return {
+    userId: username, // In a real implementation, we'd extract the actual ID
+    username,
+    displayName,
+    avatarUrl,
+    isVerified,
+    isBlueVerified
+  };
+}
+
+/**
+ * Extract media from a tweet element
+ */
+export async function extractMediaFromElement(element: any): Promise<TwitterMedia[]> {
+  const media: TwitterMedia[] = [];
+  
+  // Images
+  const images = await element.$$('[data-testid="tweetPhoto"] img');
+  for (const img of images) {
+    const src = await img.getAttribute('src');
+    if (src) {
+      media.push({
+        type: 'image',
+        url: src.replace(/&name=\w+/, '&name=large') // Get large version
+      });
+    }
+  }
+  
+  // Videos
+  const videos = await element.$$('video');
+  for (const video of videos) {
+    const src = await video.getAttribute('src');
+    const poster = await video.getAttribute('poster');
+    if (src) {
+      media.push({
+        type: 'video',
+        url: src,
+        thumbnailUrl: poster || undefined
+      });
+    }
+  }
+  
+  return media;
+}
+
+/**
+ * Parse date from Twitter's relative time format
+ */
+export function parseTwitterDate(dateText: string): Date {
+  const now = new Date();
+  
+  if (dateText.includes('s')) {
+    // seconds ago
+    const seconds = parseInt(dateText);
+    return new Date(now.getTime() - seconds * 1000);
+  } else if (dateText.includes('m')) {
+    // minutes ago
+    const minutes = parseInt(dateText);
+    return new Date(now.getTime() - minutes * 60 * 1000);
+  } else if (dateText.includes('h')) {
+    // hours ago
+    const hours = parseInt(dateText);
+    return new Date(now.getTime() - hours * 60 * 60 * 1000);
+  } else {
+    // Try to parse as actual date
+    return new Date(dateText);
+  }
+}
+
+/**
+ * Wait for and dismiss any popups or modals
+ */
+export async function dismissPopups(page: Page) {
+  // Dismiss cookie banner if present
+  const cookieBanner = page.locator('[data-testid="BottomBar"]');
+  if (await cookieBanner.isVisible({ timeout: 1000 }).catch(() => false)) {
+    const dismissButton = cookieBanner.locator('button').first();
+    await dismissButton.click().catch(() => {});
+  }
+  
+  // Dismiss any other modals
+  const closeButtons = page.locator('[aria-label="Close"]');
+  const count = await closeButtons.count();
+  for (let i = 0; i < count; i++) {
+    await closeButtons.nth(i).click().catch(() => {});
+  }
+}
+
+/**
+ * Check if an element is a promoted/ad tweet
+ */
+export async function isAdElement(element: any): Promise<boolean> {
+  try {
+    // The reliable, structural ad signal: promoted tweets carry a
+    // placementTracking testid wrapper.
+    const promotedIndicator = await element.$('[data-testid="placementTracking"]').catch(() => null);
+    if (promotedIndicator) return true;
+
+    // Text labels: use :text-is (EXACT, case-insensitive full match), NOT
+    // :has-text (substring). :has-text("Ad") matches "reAD", "thread",
+    // "alreADy", "leADer", etc., which would wrongly drop most real tweets.
+    const promotedLabel = await element.$('span:text-is("Promoted")').catch(() => null);
+    if (promotedLabel) return true;
+
+    const adLabel = await element.$('span:text-is("Ad")').catch(() => null);
+    if (adLabel) return true;
+
+    // Check for promoted tweet indicator in the social context
+    const socialContext = await element.$('[data-testid="socialContext"]').catch(() => null);
+    if (socialContext) {
+      const contextText = await socialContext.textContent().catch(() => '');
+      if (contextText.toLowerCase().includes('promoted')) return true;
+    }
+
+    return false;
+  } catch (error) {
+    return false;
+  }
+} 

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  This is a template. `make install` renders it to build/; `make schedule` loads it.
+  Fire now: launchctl kickstart -k gui/$(id -u)/com.post-digest.feed-digest
+  Remove:   make unschedule
+
+  The repo must not live under ~/Desktop, ~/Documents or ~/Downloads: launchd-spawned
+  processes are refused entry to those by TCC, and the failure is a bare
+  "Operation not permitted" with exit 126.
+
+  USER and LOGNAME are not decoration. launchd starts jobs with a stripped
+  environment, and without them Claude Code cannot read its Keychain credentials
+  and comes up "Not logged in".
+
+  Missed runs are not lost: unlike cron, launchd fires a StartCalendarInterval
+  job on the next wake, coalescing multiple missed intervals into one.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.post-digest.feed-digest</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>@@TOOLKIT_ROOT@@/scripts/run-feed-digest.sh</string>
+    </array>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>USER</key>
+        <string>@@USER@@</string>
+        <key>LOGNAME</key>
+        <string>@@USER@@</string>
+        <key>HOME</key>
+        <string>@@HOME@@</string>
+        <key>PATH</key>
+        <string>@@HOME@@/.local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <!-- Off the hour on purpose: a request stream that lands exactly at :00 is
+         the easiest kind of machine rhythm for a platform to notice. -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key><integer>8</integer>
+            <key>Minute</key><integer>7</integer>
+        </dict>
+        <dict>
+            <key>Hour</key><integer>12</integer>
+            <key>Minute</key><integer>23</integer>
+        </dict>
+        <dict>
+            <key>Hour</key><integer>19</integer>
+            <key>Minute</key><integer>11</integer>
+        </dict>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>@@HOME@@/.local/state/feed-digest/feed-digest.log</string>
+    <key>StandardErrorPath</key>
+    <string>@@HOME@@/.local/state/feed-digest/feed-digest.err</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>
