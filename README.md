@@ -17,24 +17,21 @@ how one person's taste drifted over months.
 ## The loop
 
 ```
-                     comments on `Digest Controls`
-                     (six docs, mirrored to Notion)
-                                 │
-                                 ▼
-  ┌───────────────────── one run ────────────────────────┐
-  │  criteria-keeper  ──►  the funnel  ──►  run-logger   │
-  └───────┬───────────────────┬────────────────┬─────────┘
-          │                   │                │
-     rewrites             writes rows     writes one row
-   interests.md               │                │
-          ▲                   ▼                ▼
-          │           ┌─────────────┐    ┌──────────┐
-          │           │ Feed Digest │    │ Run Log  │
-          │           └──────┬──────┘    └──────────┘
-          │                  │
-          │        you rate a row: 👍 😐 👎
-          └──────────────────┘
-                next run folds it in
+  ┌──────────────── one run ─────────────────┐
+  │   criteria-keeper   ──►   the funnel     │
+  └────────┬─────────────────────┬───────────┘
+           │                     │
+      rewrites              writes rows
+    interests.md                 │
+           ▲                     ▼
+           │             ┌─────────────┐
+           │             │ Feed Digest │
+           │             └──────┬──────┘
+           │                    │
+           │     you rate a row: 👍 😐 👎
+           │     or comment on it
+           └────────────────────┘
+                 next run folds it in
 
   the funnel, inside one run:
 
@@ -46,7 +43,7 @@ how one person's taste drifted over months.
                      (measures what the screen threw away)
 ```
 
-A run is three phases: `criteria-keeper` first, the funnel, `run-logger` last.
+A run is two phases: `criteria-keeper` first, then the funnel.
 
 ### The funnel
 
