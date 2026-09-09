@@ -2,17 +2,9 @@
 
 A reading list that builds itself. Three times a day, unattended, it pulls the recommendation
 feeds from X, Reddit, RedNote and LinkedIn, screens a few hundred posts down to a handful,
-and writes them into a Notion database with a reason attached to every row.
+and writes them into a Notion database with a reason attached to every row. You rate rows in Notion. 
+The next run folds those ratings back into the criteria and commits the change.
 
-The interesting part is not the scraping. It is that **the standard it screens by is a file the
-system rewrites itself.** You rate rows in Notion; the next run folds those ratings back into
-the criteria and commits the change. `git log -p skills/feed_digest/interests.md` is a record of
-how one person's taste drifted over months.
-
-> Extracted from a larger toolkit to be readable on its own. It will not run out of the box —
-> dependencies are not vendored, the three social servers need logged-in sessions, and every
-> Notion identifier is a `<PLACEHOLDER>` where a real page or data-source id used to be. Read
-> it, don't clone-and-go.
 
 ## The loop
 
@@ -43,11 +35,7 @@ how one person's taste drifted over months.
                      (measures what the screen threw away)
 ```
 
-A run is two phases: `criteria-keeper` first, then the funnel.
-
 ### The funnel
-
-Each level costs more than the last, so the expensive ones go last.
 
 | level | what happens | cost |
 |---|---|---|
@@ -58,8 +46,6 @@ Each level costs more than the last, so the expensive ones go last.
 | **write** | one Notion row, ten columns, a `Why` naming what it hit | one call per row |
 
 ### The feedback loop
-
-Two things come back from Notion, and they are not the same claim.
 
 **Rate a row** — 👍 useful / 😐 so-so / 👎 not useful. A 👍 or 👎 goes into the examples section
 of `interests.md` immediately. The prose above the examples changes only when two ratings point
