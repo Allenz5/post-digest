@@ -55,9 +55,3 @@ and the user moves the bar, not the agent.
 **Comment on a control page** — one Notion page mirrors each file the run is governed by: the
 skill, the criteria, and the four agent prompts. A comment there is about the document itself,
 so it is acted on the first time rather than waiting for a second data point.
-
-`criteria-keeper` runs first and is the only thing that edits any of it. Three rules do the
-work: **rewrite, never append** (`interests.md` has a 200-line ceiling, so a new idea has to
-displace an older one); **never paste the user's words in** — rewrite the instruction that
-produced the behaviour; and **test the change against the 👍 rows first**, because a rule that
-would have rejected one of those has overshot.
